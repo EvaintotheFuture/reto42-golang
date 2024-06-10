@@ -132,9 +132,9 @@ func DeleteAsteroid(c echo.Context) error {
 	}
 
 	if result.DeletedCount < 1 {
-		return c.JSON(http.StatusNotFound, responses.AsteroidResponse{Status: http.StatusNotFound, Message: "success", Data: &echo.Map{"data": "No existe un asteroide con el ID especificado"}})
+		return c.JSON(http.StatusNotFound, responses.AsteroidResponse{Status: http.StatusNotFound, Message: "error", Data: &echo.Map{"data": "No existe un asteroide con el ID especificado"}})
 	}
-	return c.JSON(http.StatusOK, responses.AsteroidResponse{Status: http.StatusOK, Message: "success", Data: &echo.Map{"data": "Asteroide eliminado exitosamente"}})
+	return c.JSON(http.StatusOK, responses.AsteroidResponse{Status: http.StatusOK, Message: "error", Data: &echo.Map{"data": "Asteroide eliminado exitosamente"}})
 }
 
 func GetAllAsteroids(c echo.Context) error {
