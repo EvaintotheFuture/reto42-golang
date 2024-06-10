@@ -70,20 +70,36 @@ func GetAsteroid(c echo.Context) error {
 func EditAsteroid(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	asteroidID := c.Param("asteroidID")
-	var asteroid models.Asteroid
+	var partialAsteroid models.PartialAsteroid
+
 	defer cancel()
 
 	ObjId, _ := primitive.ObjectIDFromHex(asteroidID)
 
-	if err := c.Bind(&asteroid); err != nil {
+	if err := c.Bind(&partialAsteroid); err != nil {
 		return c.JSON(http.StatusBadRequest, responses.AsteroidResponse{Status: http.StatusBadRequest, Message: "error", Data: &echo.Map{"data": err.Error()}})
 	}
 
-	if validationErr := validate.Struct(&asteroid); validationErr != nil {
+	if validationErr := validate.Struct(&partialAsteroid); validationErr != nil {
 		return c.JSON(http.StatusBadRequest, responses.AsteroidResponse{Status: http.StatusBadRequest, Message: "error", Data: &echo.Map{"data": validationErr.Error()}})
 	}
 
-	update := bson.M{"name": asteroid.Name,"diameter": asteroid.Diameter,  "discovery_date": asteroid.DiscoveryDate, "observations": asteroid.Observations, "distances": asteroid.Distances}
+	update := bson.M{}
+	if partialAsteroid.Name != nil {
+		update["name"] = *partialAsteroid.Name
+	}
+	if partialAsteroid.Diameter != nil {
+		update["diameter"] = *partialAsteroid.Diameter
+	}
+	if partialAsteroid.DiscoveryDate != nil {
+		update["discovery_date"] = *partialAsteroid.DiscoveryDate
+	}
+	if partialAsteroid.Observations != nil {
+		update["observations"] = *partialAsteroid.Observations
+	}
+	if partialAsteroid.Distances != nil {
+		update["distances"] = *partialAsteroid.Distances
+	}
 
 	result, err := asteroidsCollection.UpdateOne(ctx, bson.M{"_id": ObjId}, bson.M{"$set": update})
 
@@ -116,9 +132,9 @@ func DeleteAsteroid(c echo.Context) error {
 	}
 
 	if result.DeletedCount < 1 {
-		return c.JSON(http.StatusNotFound, responses.AsteroidResponse{Status: http.StatusNotFound, Message: "success", Data: &echo.Map{"data": "Asteroid with specified ID not found"}})
+		return c.JSON(http.StatusNotFound, responses.AsteroidResponse{Status: http.StatusNotFound, Message: "success", Data: &echo.Map{"data": "No existe un asteroide con el ID especificado"}})
 	}
-	return c.JSON(http.StatusOK, responses.AsteroidResponse{Status: http.StatusOK, Message: "success", Data: &echo.Map{"data": "Asteroid successfully deleted"}})
+	return c.JSON(http.StatusOK, responses.AsteroidResponse{Status: http.StatusOK, Message: "success", Data: &echo.Map{"data": "Asteroide eliminado exitosamente"}})
 }
 
 func GetAllAsteroids(c echo.Context) error {
