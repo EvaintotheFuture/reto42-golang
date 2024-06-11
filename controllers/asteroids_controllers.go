@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/EvaintotheFuture/reto42-golang/configs"
 	"github.com/EvaintotheFuture/reto42-golang/models"
 	"github.com/EvaintotheFuture/reto42-golang/responses"
-	"github.com/EvaintotheFuture/reto42-golang/configs"
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/bson"
@@ -32,14 +32,14 @@ func CreateAsteroid(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, responses.AsteroidResponse{Status: http.StatusBadRequest, Message: "error", Data: &echo.Map{"data": validationErr.Error()}})
 	}
 
-	newAsteroid := models.Asteroid {
+	newAsteroid := models.Asteroid{
 
-		ID:				primitive.NewObjectID(),
-		Name:			asteroid.Name,
-		Diameter:		asteroid.Diameter,
-		DiscoveryDate:	asteroid.DiscoveryDate,
-		Observations:	asteroid.Observations,
-		Distances:		asteroid.Distances,
+		ID:            primitive.NewObjectID(),
+		Name:          asteroid.Name,
+		Diameter:      asteroid.Diameter,
+		DiscoveryDate: asteroid.DiscoveryDate,
+		Observations:  asteroid.Observations,
+		Distances:     asteroid.Distances,
 	}
 
 	result, err := asteroidsCollection.InsertOne(ctx, newAsteroid)
@@ -62,7 +62,7 @@ func GetAsteroid(c echo.Context) error {
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, responses.AsteroidResponse{Status: http.StatusInternalServerError, Message: "error", Data: &echo.Map{"data": err.Error()}})
-}
+	}
 
 	return c.JSON(http.StatusOK, responses.AsteroidResponse{Status: http.StatusOK, Message: "success", Data: &echo.Map{"data": asteroid}})
 }
@@ -134,7 +134,7 @@ func DeleteAsteroid(c echo.Context) error {
 	if result.DeletedCount < 1 {
 		return c.JSON(http.StatusNotFound, responses.AsteroidResponse{Status: http.StatusNotFound, Message: "error", Data: &echo.Map{"data": "No existe un asteroide con el ID especificado"}})
 	}
-	return c.JSON(http.StatusOK, responses.AsteroidResponse{Status: http.StatusOK, Message: "error", Data: &echo.Map{"data": "Asteroide eliminado exitosamente"}})
+	return c.JSON(http.StatusOK, responses.AsteroidResponse{Status: http.StatusOK, Message: "success", Data: &echo.Map{"data": "Asteroide eliminado exitosamente"}})
 }
 
 func GetAllAsteroids(c echo.Context) error {
@@ -153,9 +153,9 @@ func GetAllAsteroids(c echo.Context) error {
 		var singleAsteroid models.Asteroid
 		if err = results.Decode(&singleAsteroid); err != nil {
 			return c.JSON(http.StatusInternalServerError, responses.AsteroidResponse{Status: http.StatusInternalServerError, Message: "error", Data: &echo.Map{"data": err.Error()}})
-	}
+		}
 
-	asteroids = append(asteroids, singleAsteroid)
+		asteroids = append(asteroids, singleAsteroid)
 	}
 
 	return c.JSON(http.StatusOK, responses.AsteroidResponse{Status: http.StatusOK, Message: "success", Data: &echo.Map{"data": asteroids}})
